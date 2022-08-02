@@ -1,0 +1,14 @@
+{
+  "name": "hardhat-project",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^1.0.2",
+    "@nomiclabs/hardhat-solhint": "^2.0.1",
+    "hardhat": "^2.10.1",
+    "hardhat-deploy": "^0.11.12"
+  },
+  "dependencies": {
+    "@chainlink/contracts": "^0.4.2",
+    "prettier": "^2.7.1",
+    "prettier-plugin-solidity": "^1.0.0-dev.23"
+  }
+}
