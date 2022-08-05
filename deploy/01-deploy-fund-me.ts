@@ -15,10 +15,12 @@ const deployFundMe: DeployFunction = async ({
   const { deploy, log, get } = deployments
   const { deployer } = await getNamedAccounts()
   const chainId: number = network.config.chainId!
+  const isDevelopmentChain: boolean = developmentChains.includes(network.name)
+
   log('Deploying fund-me...', { deployer, chainId })
 
   let ethUsdPriceFeedAddress: string
-  if (developmentChains.includes(network.name)) {
+  if (isDevelopmentChain) {
     const ethUsdAggregator = await get('MockV3Aggregator')
     ethUsdPriceFeedAddress = ethUsdAggregator.address
   } else {
@@ -32,7 +34,7 @@ const deployFundMe: DeployFunction = async ({
     from: deployer,
     args: args,
     log: true,
-    waitConfirmations: 6,
+    waitConfirmations: isDevelopmentChain ? 0 : 6,
   })
 
   log(
