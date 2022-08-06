@@ -133,5 +133,14 @@ describe('FundMe', () => {
         deployerStartBalance.add(startContractBalance).sub(gasCost),
       )
     })
+
+    it('only owner can witdraw', async function () {
+      const accounts = await ethers.getSigners()
+      const contract = await fundMe.connect(accounts[1])
+      await expect(contract.withdraw()).to.be.revertedWithCustomError(
+        fundMe,
+        'FundMe__NotOwner',
+      )
+    })
   })
 })
