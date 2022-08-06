@@ -9,6 +9,7 @@ describe('FundMe', () => {
 
   beforeEach(async function () {
     deployer = (await getNamedAccounts()).deployer
+
     await deployments.fixture(['all'])
     fundMe = await ethers.getContract('FundMe', deployer)
     mockV3aggregator = await ethers.getContract('MockV3Aggregator', deployer)
@@ -95,6 +96,42 @@ describe('FundMe', () => {
       // expect(totalDeployerBalanceAfterWithdraw.toString()).to.be.equal(
       //   deployerEndBalanceWithGasCost.toString(),
       // )
+    })
+    it('Accept withdraw from multiple funders', async function () {
+      const accounts = await ethers.getSigners()
+      await fundMe
+        .connect(accounts[1])
+        .fund({ value: ethers.utils.parseEther('0.1') })
+      await fundMe
+        .connect(accounts[2])
+        .fund({ value: ethers.utils.parseEther('0.1') })
+      await fundMe
+        .connect(accounts[3])
+        .fund({ value: ethers.utils.parseEther('0.1') })
+      await fundMe
+        .connect(accounts[4])
+        .fund({ value: ethers.utils.parseEther('0.1') })
+      await fundMe
+        .connect(accounts[5])
+        .fund({ value: ethers.utils.parseEther('0.1') })
+
+      const startContractBalance = await fundMe.provider.getBalance(
+        fundMe.address,
+      )
+      const deployerStartBalance = await fundMe.provider.getBalance(deployer)
+      const tx = await fundMe.withdraw()
+      const txRecipit = await tx.wait(1)
+      const { gasUsed, effectiveGasPrice } = txRecipit
+      const gasCost = gasUsed.mul(effectiveGasPrice)
+      const endContractBalance = await fundMe.provider.getBalance(
+        fundMe.address,
+      )
+      const deployerEndBalance = await fundMe.provider.getBalance(deployer)
+
+      expect(endContractBalance.toString()).to.be.equal('0')
+      expect(deployerEndBalance).to.be.equal(
+        deployerStartBalance.add(startContractBalance).sub(gasCost),
+      )
     })
   })
 })
