@@ -57,4 +57,44 @@ describe('FundMe', () => {
       expect(funder).to.be.equal(deployer)
     })
   })
+
+  describe('withdraw', async function () {
+    beforeEach(async function () {
+      const amount = ethers.utils.parseEther('0.1')
+      await fundMe.fund({
+        value: amount,
+      })
+    })
+    it('gives a single funder all their ETH back', async function () {
+      const startContractBalance = await fundMe.provider.getBalance(
+        fundMe.address,
+      )
+      const deployerStartBalance = await fundMe.provider.getBalance(deployer)
+
+      const tx = await fundMe.withdraw()
+      const { gasUsed, effectiveGasPrice } = await tx.wait()
+
+      const gasCost = gasUsed.mul(effectiveGasPrice)
+
+      const endContractBalance = await fundMe.provider.getBalance(
+        fundMe.address,
+      )
+      const deployerEndBalance = await fundMe.provider.getBalance(deployer)
+
+      expect(endContractBalance.toString()).to.be.equal('0')
+      expect(deployerEndBalance).to.be.equal(
+        deployerStartBalance.add(startContractBalance).sub(gasCost),
+      )
+
+      // const totalDeployerBalanceAfterWithdraw =
+      //   startContractBalance.add(deployerStartBalance)
+
+      // const deployerEndBalanceWithGasCost = deployerEndBalance.add(gasCost)
+
+      // expect(endContractBalance.toString()).to.be.equal('0')
+      // expect(totalDeployerBalanceAfterWithdraw.toString()).to.be.equal(
+      //   deployerEndBalanceWithGasCost.toString(),
+      // )
+    })
+  })
 })
