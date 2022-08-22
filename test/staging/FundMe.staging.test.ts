@@ -9,7 +9,7 @@ developmentChains.includes(network.name)
   : describe('FundMe', async function () {
       let fundMe: FundMe
       let deployer: string
-      const sendValue = ethers.utils.parseEther('1')
+      const sendValue = ethers.utils.parseEther('0.1')
 
       beforeEach(async function () {
         deployer = (await getNamedAccounts()).deployer
@@ -20,6 +20,6 @@ developmentChains.includes(network.name)
         await fundMe.fund({ value: sendValue })
         await fundMe.withdraw()
         const endBalance = await fundMe.provider.getBalance(fundMe.address)
-        expect(endBalance.toString).equal('0')
+        expect(endBalance.toString()).equal('0')
       })
     })
